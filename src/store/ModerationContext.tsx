@@ -8,6 +8,7 @@ interface ModerationContextType {
     tickets: Ticket[];
     setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>;
     reportImage: (imageId: number, reason: string) => void;
+    resolveTicket: (ticketId: number, action: 'accept' | 'reject') => void;
 }
 
 const ModerationContext = createContext<ModerationContextType | undefined>(undefined);
@@ -31,8 +32,24 @@ export const ModerationProvider: React.FC<{ children: ReactNode }> = ({ children
         ));
     };
 
+    // Fonction pour résoudre un ticket
+    const resolveTicket = (ticketId: number, action: 'accept' | 'reject') => {
+        const ticket = tickets.find(t => t.id === ticketId);
+        if (!ticket) return;
+
+        setTickets(prev => prev.map(t =>
+            t.id === ticketId ? { ...t, status: 'resolved' } : t
+        ));
+
+        setImages(prev => prev.map(img => 
+            img.id === ticket.imageId 
+                ? { ...img, status: action === 'accept' ? 'deleted' : 'active' } 
+                : img
+        ));
+    };
+
     return (
-        <ModerationContext.Provider value={{ images, setImages, tickets, setTickets, reportImage }}>
+        <ModerationContext.Provider value={{ images, setImages, tickets, setTickets, reportImage, resolveTicket }}>
             {children}
         </ModerationContext.Provider>
     );
