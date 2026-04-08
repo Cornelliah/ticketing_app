@@ -1,5 +1,6 @@
 import React from 'react';
 import { type Ticket, type Image } from '../types';
+import { useModeration } from '../store/ModerationContext';
 
 interface TicketCardProps {
     ticket: Ticket;
@@ -7,6 +8,8 @@ interface TicketCardProps {
 }
 
 export const TicketCard: React.FC<TicketCardProps> = ({ ticket, image }) => {
+    const { resolveTicket } = useModeration();
+
     return (
         <div className="ticket-card" style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '15px', display: 'flex', gap: '20px', alignItems: 'flex-start', backgroundColor: '#fdfdfd' }}>
             {image && (
@@ -27,6 +30,23 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, image }) => {
                     </span>
                     <span style={{ padding: '3px 0' }}>Date : {new Date(ticket.createdAt).toLocaleString()}</span>
                 </div>
+                
+                {ticket.status === 'open' && (
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                        <button 
+                            onClick={() => resolveTicket(ticket.id, 'accept')} 
+                            style={{ backgroundColor: '#ff4d4f', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            Supprimer l'image
+                        </button>
+                        <button 
+                            onClick={() => resolveTicket(ticket.id, 'reject')} 
+                            style={{ backgroundColor: '#52c41a', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
+                        >
+                            Ignorer le signalement
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
